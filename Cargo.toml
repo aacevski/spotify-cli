@@ -1,0 +1,20 @@
+[package]
+name = "spotify-cli"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.136", features = ["derive"] }
+reqwest = { version = "0.11.9", features = [ "json" ]}
+tokio = { version = "1.16.1", features = ["macros", "io-util", "rt-multi-thread"] }
+base64 = "0.13.0"
+spotify-oauth = "0.3.0"
+async-std = { version = "1.10.0", features = ["attributes"]}
+open = "2.0.2"
+rspotify = { version = "0.11.3", features = ["cli"]}
+
+[env]
+SPOTIFY_CLIENT_ID = "27759326a5b8493a87ee6bcae5aae99a" 
+SPOTIFY_CLIENT_SECRET = "371582aeb9374bf3aa6c9090630dce01"
