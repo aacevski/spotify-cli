@@ -2,10 +2,7 @@ use rspotify::{prelude::*, scopes, AuthCodeSpotify, Credentials, OAuth};
 
 #[tokio::main]
 async fn main() {
-    let creds = Credentials::new(
-        "27759326a5b8493a87ee6bcae5aae99a",
-        "371582aeb9374bf3aa6c9090630dce01",
-    );
+    let creds = Credentials::new();
 
     let oauth = OAuth {
         redirect_uri: "http://localhost:3000/callback".to_string(),
