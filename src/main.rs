@@ -18,17 +18,14 @@ struct TopArtists {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let value = format!(
-        "{}:{}",
-        "140526a5c3074a7cba86129838ea667b", "f819e6031f2b4ab58e6382212eede196"
-    );
+    let value = format!("{}:{}", "", "");
     let value = format!("Basic {}", base64::encode(value));
 
     let client = reqwest::Client::new();
 
     let mut map = HashMap::new();
     map.insert("grant_type", "refresh_token");
-    map.insert("refresh_token", "AQAfSpxhdj5URPVooNoUN8RxDVPOKIcZLgkPNfwkJ7V8yCremIt05sW2OMgVec7l2Cft3uln6gvRNoNLsC9kQcg__fbr81GgmOhQ2i5OhjFYsKzk1eIwZ8Q8T85CRciII_4");
+    map.insert("refresh_token", "");
 
     let res = client
         .post("https://accounts.spotify.com/api/token")
