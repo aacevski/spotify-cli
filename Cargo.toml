@@ -14,7 +14,5 @@ spotify-oauth = "0.3.0"
 async-std = { version = "1.10.0", features = ["attributes"]}
 open = "2.0.2"
 rspotify = { version = "0.11.3", features = ["cli"]}
-
-[env]
-SPOTIFY_CLIENT_ID = "27759326a5b8493a87ee6bcae5aae99a" 
-SPOTIFY_CLIENT_SECRET = "371582aeb9374bf3aa6c9090630dce01"
+url = "2.2.2"
+dotenv = "0.15.0"

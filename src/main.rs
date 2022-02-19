@@ -1,31 +1,55 @@
-use reqwest::header::HeaderMap;
 use reqwest::Error;
-use serde::Deserialize;
 use std::collections::HashMap;
-
-#[derive(Deserialize, Debug)]
-struct AccessToken {
-    access_token: String,
-    token_type: String,
-    expires_in: u32,
-    scope: String,
-}
-
-#[derive(Deserialize, Debug)]
-struct TopArtists {
-    timestamp: usize,
-}
+use std::collections::HashSet;
+use url::Url;
+extern crate dotenv;
+use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let value = format!("{}:{}", "", "");
-    let value = format!("Basic {}", base64::encode(value));
-
+    dotenv::dotenv().ok();
     let client = reqwest::Client::new();
 
+    let mut scopes: HashSet<String> = HashSet::new();
+
+    scopes.insert("user-read-currently-playing".to_string());
+    scopes.insert("user-read-recently-played".to_string());
+
+    let scopes = join_scopes(&scopes);
+
+    let url = generate_authorization_url(
+        scopes,
+        env::var("SPOTIFY_ID").unwrap(),
+        "http://localhost:3000/callback".to_string(),
+    );
+
+    println!("{}", url);
+
+    open::that(url).unwrap();
+
+    let mut callback_url = String::new();
+    println!("Enter the callback URL from the browser");
+    std::io::stdin().read_line(&mut callback_url).unwrap();
+
+    let callback_url = Url::parse(&callback_url).unwrap();
+
+    let code = callback_url
+        .query()
+        .unwrap()
+        .to_owned()
+        .replace("code=", "");
+
     let mut map = HashMap::new();
-    map.insert("grant_type", "refresh_token");
-    map.insert("refresh_token", "");
+    map.insert("grant_type", "authorization_code");
+    map.insert("code", &code);
+    map.insert("redirect_uri", "http://localhost:3000/callback");
+
+    let value = format!(
+        "{}:{}",
+        env::var("SPOTIFY_ID").unwrap(),
+        env::var("SPOTIFY_SECRET").unwrap()
+    );
+    let value = format!("Basic {}", base64::encode(value));
 
     let res = client
         .post("https://accounts.spotify.com/api/token")
@@ -35,17 +59,27 @@ async fn main() -> Result<(), Error> {
         .send()
         .await?;
 
-    let value: AccessToken = res.json().await?;
-
-    let response = client
-        .get("https://api.spotify.com/v1/me/player/currently-playing")
-        .header("Authorization", format!("Bearer {}", value.access_token))
-        .send()
-        .await?;
-
-    let artists: TopArtists = response.json().await?;
-
-    println!("Response: {:?}", artists);
+    println!("{:?}", res.text().await?);
 
     Ok(())
+}
+
+fn join_scopes(scopes: &HashSet<String>) -> String {
+    return scopes
+        .iter()
+        .map(String::as_str)
+        .collect::<Vec<_>>()
+        .join(" ");
+}
+
+fn generate_authorization_url(scopes: String, client_id: String, redirect_uri: String) -> String {
+    let mut url_params: HashMap<&str, &str> = HashMap::new();
+    url_params.insert("client_id", &client_id);
+    url_params.insert("response_type", "code");
+    url_params.insert("redirect_uri", &redirect_uri);
+    url_params.insert("scope", &scopes);
+
+    let parsed_url = Url::parse_with_params("https://accounts.spotify.com/authorize", &url_params);
+
+    return parsed_url.unwrap().to_string();
 }

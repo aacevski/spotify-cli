@@ -1528,12 +1528,14 @@ version = "0.1.0"
 dependencies = [
  "async-std",
  "base64 0.13.0",
+ "dotenv",
  "open",
  "reqwest",
  "rspotify",
  "serde",
  "spotify-oauth",
  "tokio",
+ "url",
 ]
 
 [[package]]
